@@ -1,0 +1,506 @@
+#compdef kws
+#
+# zsh completion for kws (https://github.com/pipedrive/k8s-workstation)
+#
+# version:  0.1.0
+# github:   https://github.com/gregbook/kws-completion
+#
+# contributors:
+#   - Gregor Arzouyan
+
+__kws_config_commands() {
+    local -a _kws_config_subcommands
+    
+    _kws_config_subcommands=(
+        'init':'Initialize Kubernetes workstation config'
+        'get':'Display current key value'
+        'set':'Set a new key value'
+        'list':'Display all values for given config.'
+        'reset':'Clear all values and reset to default'
+    )
+    _describe -t kws-config-commands "kws config command" _kws_config_subcommands
+}
+
+__kws_config_subcommands() {
+    local -a _command_args opts_help
+    local expl help="-h --help"
+    integer ret=1
+
+    opts_help=("(: -)"{-h,--help}"[display help for command]")
+
+    case "$words[1]" in
+        (init)
+            _arguments \
+                $opts_help \
+                "($help -d --with-defaults)"{-d,--with-defaults}"[Configure Kubernetes workstation with default settings]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (get)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (set)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (list)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (reset)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+    esac
+
+    return ret
+}
+
+__kws_cluster_commands() {
+    local -a _kws_cluster_subcommands
+    
+    _kws_cluster_subcommands=(
+        'install':'Print out instructions for cluster driver installation.'
+        'start':'Start local Kubernetes cluster.'
+        'stop':'Stop local Kubernetes cluster (depending on the cluster driver, it might delete all kubernetes resources).'
+        'reset':'Reset local Kubernets cluster. Active namespace will be deleted and recreated.'
+        'status':'Show an overview of Kubernetes cluster status and settings.'
+        )
+    _describe -t kws-cluster-commands "kws cluster command" _kws_cluster_subcommands
+}
+
+__kws_cluster_subcommands() {
+    local -a _command_args opts_help
+    local expl help="-h --help"
+    integer ret=1
+
+    opts_help=("(: -)"{-h,--help}"[display help for command]")
+
+    case "$words[1]" in
+        (install)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (start)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (stop)
+            _arguments \
+                $opts_help \
+                "($help -f --force)"{-f,--force}"[Stop cluster without confirmation (default: false)]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (reset)
+            _arguments \
+                $opts_help \
+                "($help -f --force)"{-f,--force}"[Stop cluster without confirmation (default: false)]" \
+                "($help)--volumes[Delete volumes (default: false)]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (status)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+    esac
+
+    return ret
+}
+
+__kws_service_commands() {
+    local -a _kws_service_subcommands
+    
+    _kws_service_subcommands=(
+        'deploy':'Deploy a service in Kubernetes workstation cluster.'
+        'remove':'Remove service(s) from Kubernetes workstation cluster.'
+        'restart':'Restart service(s) in Kubernetes workstation cluster.'
+        'logs':'Attach to a service container and show logs.'
+        'exec':'Send a command to pod container or open a shell inside the container.'
+        'list':'Display services available in k8s dev env.'
+        'status':'Prints a list of deployed services and their pods.'
+        'up':'Starts the service from the current directory.'
+        'down':'Stops the service from the current directory'
+    )
+    
+    _describe -t kws-service-commands "kws service command" _kws_service_subcommands
+}
+
+__kws_service_subcommands() {
+    local -a _command_args opts_help
+    local expl help="-h --help"
+    integer ret=1
+
+    opts_help=("(: -)"{-h,--help}"[display help for command]")
+
+    case "$words[1]" in
+        (deploy)
+            _arguments \
+                $opts_help \
+                "($help)--mode[mode dev or prod (default: \"PROD\")]:mode:((dev prod))" \
+                "($help)--build[force building the service image for DEV mode (default: false)]" \
+                "($help)--clean[remove service volumes before starting (default: false)]" \
+                "($help)--no-pull[skip always pulling new images (sets imagePullPolicy to IfNotPresent)]" \
+                "($help)--no-parallel[deploy services sequencially]" \
+                "($help)--local[use local repository for PROD mode (default: false)]" \
+                "($help)--force[force an update to the service by uninstalling it first (default: false)]" \
+                "($help)--wait[wait for resources to be in Ready state (default: false)]" \
+                "($help)--dry-run[do a dry-run, do not apply manifests (default: false)]" \
+                "($help)--debug[print rendered values and manifests (default: false)]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (remove)
+            _arguments \
+                $opts_help \
+                "($help)--clean[also remove service volumes (default: false)]" \
+                "($help)--no-parallel[removes services sequencially]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (restart)
+            _arguments \
+                $opts_help \
+                "($help)--wait[wait for resources to be in Ready state (default: false)]" \
+                "($help)--no-parallel[removes services sequencially]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (logs)
+            _arguments \
+                $opts_help \
+                "($help)--follow[leave the log stream open and print new log records as they arrive (default: false)]" \
+                "($help)--all[show logs from all service pods and containers (default: false)]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (exec)
+            _arguments \
+                $opts_help \
+                "($help)--command[execute the command in a container (default: \"sh\")]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (list)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (status)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (up)
+            _arguments \
+                $opts_help \
+                "($help)--mode[mode dev or prod (default: \"DEV\")]:mode:((dev prod))" \
+                "($help)--build[force building the service image for DEV mode (default: false)]" \
+                "($help)--clean[remove service volumes before starting (default: false)]" \
+                "($help)--force[force an update to the service by uninstalling it first (default: false)]" \
+                "($help)--dry-run[print out k8s manifest (default: false)]" \
+                "($help -d --detach)"{-d,--detach}"[starts the service in the background (default: false)]" \
+                "($help)--select-logs[select pod/container to follow logs (default: false)]" \
+                "($help)--functional-tests[starts the service with functional-tests value files (default: false)]" \
+                "($help)--coverage[includes coverage value file for functional-tests (requires --functional-tests) (default: false)]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (down)
+            _arguments \
+                $opts_help \
+                "($help)--clean[also remove service volumes (default: false)]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+    esac
+
+    return ret
+}
+
+__kws_stack_commands() {
+    local -a _kws_stack_subcommands
+    
+    _kws_stack_subcommands=(
+        'deploy':'Deploy services within a stack on Kubernetes cluster.'
+        'remove':'Remove service(s) belonging to a stack from Kubernetes workstation cluster.'
+        'list':'Display stacks available in k8s dev env.'
+    )
+    
+    _describe -t kws-stack-commands "kws stack command" _kws_stack_subcommands
+}
+
+__kws_stack_subcommands() {
+    local -a _command_args opts_help
+    local expl help="-h --help"
+    integer ret=1
+
+    opts_help=("(: -)"{-h,--help}"[display help for command]")
+
+    case "$words[1]" in
+        (deploy)
+            _arguments \
+                $opts_help \
+                "($help)--path[path to user defined custom stacks]:directory:_files" \
+                "($help)--no-pull[skip always pulling new images (sets imagePullPolicy to IfNotPresent)]" \
+                "($help)--no-parallel[start services sequencially]" \
+                "($help)--wait[wait for resources to be in Ready state (default: false)]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (remove)
+            _arguments \
+                $opts_help \
+                "($help -d --with-defaults)"{-d,--with-defaults}"[delete all services from the stack]" \
+                "($help)--path[path to user defined custom stacks]:directory:_files" \
+                "($help)--no-parallel[remove services sequencially]" \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (list)
+            _arguments \
+                $opts_help \
+                "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+    esac
+
+    return ret
+}
+
+__kws_kubeconfig_commands() {
+    local -a _kws_kubeconfig_subcommands
+    
+    _kws_kubeconfig_subcommands=(
+        'update':'Update kubeconfig based on KWS config.'
+    )
+
+    _describe -t kws-kubeconfig-commands "kws kubeconfig command" _kws_kubeconfig_subcommands
+}
+
+__kws_kubeconfig_subcommands() {
+    local -a _command_args opts_help
+    local expl help="-h --help"
+    integer ret=1
+
+    opts_help=("(: -)"{-h,--help}"[display help for command]")
+    case "$words[1]" in
+    (update)
+        _arguments \
+        "($help)--verbose[turn on verbose logging]" && ret=0
+        ;;
+    esac
+
+    return ret
+}
+
+__kws_testbox_commands() {
+    local -a _kws_testbox_subcommands
+
+    _kws_testbox_subcommands=(
+        'service'
+        'enter':'Opens a shell in selected pod container in currently active testbox. Selection is interactive.'
+        'logs':'Prints the logs of a Kuberbetes pod and attaches to it in a testbox.'
+    )
+
+    _describe -t kws-testbox-commands "kws testbox command" _kws_testbox_subcommands
+}
+
+__kws_testbox_subcommands() {
+    
+    local -a _command_args opts_help
+    local expl help="-h --help"
+    integer ret=1
+
+    opts_help=("(: -)"{-h,--help}"[display help for command]")
+    case "$words[1]" in
+        (service)
+            _arguments \
+            "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (logs)
+            _arguments \
+            "($help -f --follow)"{-f,--follow}"[specify if the logs should be followed (streamed)]" \
+            "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+        (enter)
+            _arguments \
+            "($help)--verbose[turn on verbose logging]" && ret=0
+            ;;
+    esac
+
+    return ret
+}
+
+__kws_commands() {
+    local -a _kws_subcommands
+    _kws_subcommands=(
+        "init:Initialize kubernetes workstation."
+        "config:Kubernetes workstation configuration."
+        "cluster:Kubernetes workstation cluster management."
+        "status:Analyze Kubernetes workstation and local development environment setup."
+        "service:Kubernetes workstation service management."
+        "stack:Kubernetes workstation stack (service groups) management."
+        "kubeconfig:Kubectl configuration file management."
+        "open:Open service of local dev environment in web browser. To open Pipedrive in web browser use 'app' as service name."
+        "testbox:See https://github.com/pipedrive/k8s-workstation/blob/master/docs/testbox-dev/README.md."
+    )
+    _describe -t kws-commands "kws command" _kws_subcommands
+}
+
+__kws_subcommand() {
+    local -a _command_args opts_help
+    local expl help="-h --help"
+    integer ret=1
+
+    opts_help=("(: -)"{-h,--help}"[display help for command]")
+
+    case "$words[1]" in
+    (init)
+        _arguments \
+        "($help)--verbose[turn on verbose logging]" && ret=0
+        ;;
+    (config)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            "($help -): :->command" \
+            "($help -)*:: :->option-or-argument" && ret=0
+
+        case $state in
+            (command)
+                __kws_config_commands && ret=0
+                ;;
+            (option-or-argument)
+                curcontext=${curcontext%:*:*}:kws-${words[-1]}:
+                __kws_config_subcommands && ret=0
+                ;;
+        esac
+        ;;
+    (cluster)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            "($help -): :->command" \
+            "($help -)*:: :->option-or-argument" && ret=0
+
+        case $state in
+            (command)
+                __kws_cluster_commands && ret=0
+                ;;
+            (option-or-argument)
+                curcontext=${curcontext%:*:*}:kws-${words[-1]}:
+                __kws_cluster_subcommands && ret=0
+                ;;
+        esac
+        ;;
+    (status)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            && ret=0
+        ;;
+    (service)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            "($help -): :->command" \
+            "($help -)*:: :->option-or-argument" && ret=0
+
+        case $state in
+            (command)
+                __kws_service_commands && ret=0
+                ;;
+            (option-or-argument)
+                curcontext=${curcontext%:*:*}:kws-${words[-1]}:
+                __kws_service_subcommands && ret=0
+                ;;
+        esac
+        ;;
+    (stack)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            "($help -): :->command" \
+            "($help -)*:: :->option-or-argument" && ret=0
+
+        case $state in
+            (command)
+                __kws_stack_commands && ret=0
+                ;;
+            (option-or-argument)
+                curcontext=${curcontext%:*:*}:kws-${words[-1]}:
+                __kws_stack_subcommands && ret=0
+                ;;
+        esac
+        ;;
+    (kubeconfig)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            "($help -): :->command" \
+            "($help -)*:: :->option-or-argument" && ret=0
+
+        case $state in
+            (command)
+                __kws_kubeconfig_commands && ret=0
+                ;;
+            (option-or-argument)
+                curcontext=${curcontext%:*:*}:kws-${words[-1]}:
+                __kws_kubeconfig_subcommands && ret=0
+                ;;
+        esac
+        ;;
+    (testbox)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            "($help -): :->command" \
+            "($help -)*:: :->option-or-argument" && ret=0
+
+        case $state in
+            (command)
+                __kws_testbox_commands && ret=0
+                ;;
+            (option-or-argument)
+                curcontext=${curcontext%:*:*}:kws-${words[-1]}:
+                __kws_testbox_subcommands && ret=0
+                ;;
+        esac
+        ;;
+    esac
+
+    return ret
+}
+
+_kws() {
+    local curcontext="$curcontext" state line help="-h --help -V --version"
+    integer ret=1
+    local -a args
+    typeset -A opt_args
+
+    _arguments -C \
+        "(: -)"{-h,--help}"[display help command]" \
+        "(: -)"{-V,--version}"[output the version number]" \
+        "($help)--verbose[turn on verbose logging]" \
+        "($help -): :->command" \
+        "($help -)*:: :->option-or-argument" \
+        && ret=0
+
+    case $state in 
+        (command)
+            __kws_commands && ret=0
+            ;;
+        (option-or-argument)
+            curcontext=${curcontext%:*:*}:kws-$words[1]:
+            __kws_subcommand && ret=0
+            ;;
+    esac
+
+    return ret
+}
+
+_kws "$@"
