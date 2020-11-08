@@ -8,6 +8,16 @@
 # contributors:
 #   - Gregor Arzouyan
 
+__kws_get_running_services() {
+    integer ret=1
+    local -a services
+
+    services=(${(f)${:-"$(_call_program services helm list -q $helm_options)"$'\n'}})
+
+    _describe -t services-running "running services" services && ret=0
+    return ret
+}
+
 __kws_config_commands() {
     local -a _kws_config_subcommands
     
@@ -280,9 +290,11 @@ __kws_kubeconfig_subcommands() {
     integer ret=1
 
     opts_help=("(: -)"{-h,--help}"[display help for command]")
+
     case "$words[1]" in
     (update)
         _arguments \
+        $opts_help \
         "($help)--verbose[turn on verbose logging]" && ret=0
         ;;
     esac
@@ -309,6 +321,7 @@ __kws_testbox_subcommands() {
     integer ret=1
 
     opts_help=("(: -)"{-h,--help}"[display help for command]")
+
     case "$words[1]" in
         (service)
             _arguments \
@@ -453,6 +466,15 @@ __kws_subcommand() {
                 ;;
         esac
         ;;
+    (open)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            "($help -u --print-url)"{-u,--print-url}"[print service url]" \
+            "($help -p --path)"{-d,--path}"[print service url with custom path]" \
+            "($help)1:services:__kws_get_running_services" && ret=0
+        ;;
     (testbox)
         local curcontext="$curcontext" state
         _arguments \
@@ -489,6 +511,8 @@ _kws() {
         "($help -): :->command" \
         "($help -)*:: :->option-or-argument" \
         && ret=0
+
+    local helm_options="--kube-context docker-desktop --namespace pipedrive"
 
     case $state in 
         (command)
