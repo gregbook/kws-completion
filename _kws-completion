@@ -283,6 +283,7 @@ __kws_kubeconfig_subcommands() {
     case "$words[1]" in
     (update)
         _arguments \
+        $opts_help \
         "($help)--verbose[turn on verbose logging]" && ret=0
         ;;
     esac
@@ -452,6 +453,14 @@ __kws_subcommand() {
                 __kws_kubeconfig_subcommands && ret=0
                 ;;
         esac
+        ;;
+    (open)
+        local curcontext="$curcontext" state
+        _arguments \
+            $opts_help \
+            "($help)--verbose[turn on verbose logging]" \
+            "($help -u --print-url)"{-u,--print-url}"[print service url]" \
+            "($help -p --path)"{-d,--path}"[print service url with custom path]" && ret=0
         ;;
     (testbox)
         local curcontext="$curcontext" state
